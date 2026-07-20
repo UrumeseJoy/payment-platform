@@ -1,0 +1,19 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(./mvnw -q compile)",
+      "Bash(java -version)",
+      "Read(//Users/urumesejoy/.m2/repository/net/bytebuddy/**)",
+      "Read(//Users/urumesejoy/.m2/repository/org/mockito/mockito-core/**)",
+      "Bash(find ~/.m2/repository/net/bytebuddy/byte-buddy -maxdepth 1)",
+      "Read(//Users/urumesejoy/.m2/repository/net/bytebuddy/byte-buddy/**)",
+      "Bash(mvn -q dependency:tree -Dincludes=net.bytebuddy)",
+      "Bash(find / -maxdepth 0)",
+      "Read(//Users/urumesejoy/Downloads/**)",
+      "Bash(cd \"/Users/urumesejoy/Downloads/payment-platform 2\" && grep -B2 -A5 \"byte-buddy<\" ~/.m2/repository/org/mockito/mockito-core/5.20.0/mockito-core-5.20.0.pom)",
+      "Read(//Users/urumesejoy/.m2/repository/org/mockito/mockito-core/5.20.0/**)",
+      "Bash(cd \"/Users/urumesejoy/Downloads/payment-platform 2\" && find ~/.m2/repository -path \"*spring-boot-dependencies*\" -name \"*.pom\" | head -3)",
+      "Read(//Users/urumesejoy/.m2/repository/**)"
+    ]
+  }
+}

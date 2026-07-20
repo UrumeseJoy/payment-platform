@@ -5,7 +5,7 @@ spring:
   datasource:
     url: jdbc:postgresql://localhost:5432/payment_platform
     username: postgres
-    password: password
+    password: 2536
 
   jpa:
     hibernate:
