@@ -6,6 +6,9 @@ import com.paymentplatform.payment.dto.CreatePaymentRequest;
 import com.paymentplatform.payment.dto.PaymentResponse;
 import com.paymentplatform.payment.entity.Payment;
 import com.paymentplatform.payment.repository.PaymentRepository;
+import com.paymentplatform.orchestration.messaging.PaymentEvent;
+import com.paymentplatform.orchestration.messaging.PaymentEventProducer;
+import com.paymentplatform.orchestration.messaging.PaymentEventType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,14 +27,17 @@ public class PaymentService {
     private final PaymentRepository paymentRepository;
     private final RedisTemplate<String, String> redisTemplate;
     private final ObjectMapper objectMapper;
+    private final PaymentEventProducer paymentEventProducer;
 
     @Autowired
     public PaymentService(PaymentRepository paymentRepository,
                            RedisTemplate<String, String> redisTemplate,
-                           ObjectMapper objectMapper) {
+                           ObjectMapper objectMapper,
+                           PaymentEventProducer paymentEventProducer) {
         this.paymentRepository = paymentRepository;
         this.redisTemplate = redisTemplate;
         this.objectMapper = objectMapper;
+        this.paymentEventProducer = paymentEventProducer;
     }
 
     public PaymentResponse createPayment(CreatePaymentRequest request, String idempotencyKey) {
@@ -60,6 +66,8 @@ public class PaymentService {
                             "Constraint violation but no payment found for key: " + idempotencyKey));
             return toResponse(winner);
         }
+
+        paymentEventProducer.publish(new PaymentEvent(payment.getId(), PaymentEventType.PAYMENT_CREATED, payment.getAmount()));
 
         PaymentResponse response = toResponse(payment);
         cache(redisKey, response);
