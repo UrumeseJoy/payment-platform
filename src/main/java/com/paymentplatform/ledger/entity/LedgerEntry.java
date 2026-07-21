@@ -11,6 +11,8 @@ import org.hibernate.annotations.CreationTimestamp;
 
 import java.math.BigDecimal;
 import java.time.Instant;
+import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 /**
@@ -60,8 +62,25 @@ public class LedgerEntry {
         this.relatedEvent = relatedEvent;
     }
 
-    // TODO (you write this): a static factory like
-    // LedgerEntry.pairFor(paymentId, PaymentStatus.CAPTURED, amount)
-    // that returns the matched debit+credit pair for a given transition,
-    // so callers can never accidentally post an unbalanced single entry.
+    private static final Set<PaymentStatus> LEDGER_AFFECTING_EVENTS =
+            Set.of(PaymentStatus.CAPTURED, PaymentStatus.REVERSED);
+
+    public static boolean affectsLedger(PaymentStatus event) {
+        return LEDGER_AFFECTING_EVENTS.contains(event);
+    }
+
+    public static List<LedgerEntry> pairFor(UUID paymentId, PaymentStatus event, BigDecimal amount) {
+        return switch (event) {
+            case CAPTURED -> List.of(
+                    new LedgerEntry(paymentId, LedgerAccount.PLATFORM_SUSPENSE, EntryType.DEBIT, amount, event),
+                    new LedgerEntry(paymentId, LedgerAccount.MERCHANT_WALLET, EntryType.CREDIT, amount, event)
+            );
+            case REVERSED -> List.of(
+                    new LedgerEntry(paymentId, LedgerAccount.MERCHANT_WALLET, EntryType.DEBIT, amount, event),
+                    new LedgerEntry(paymentId, LedgerAccount.CUSTOMER_WALLET, EntryType.CREDIT, amount, event)
+            );
+            default -> throw new IllegalArgumentException(
+                    "No ledger postings are defined for event: " + event);
+        };
+    }
 }

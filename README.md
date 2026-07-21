@@ -68,3 +68,9 @@ before a call, so keep it honest and specific)_
 Auth/JWT, real gateway integration, microservices split, observability
 stack (Prometheus/Grafana), circuit breakers. Not gaps — deliberate cuts to
 keep the project finishable and defensible in a week.
+
+- **Only CAPTURED and REVERSED post ledger entries**: AUTHORIZED represents
+  a hold, not a booked money movement, so it doesn't touch the ledger.
+  This avoids needing a reversal entry to "release" a hold when a payment
+  fails after authorization — CREATED/AUTHORIZED/FAILED never touch the
+  ledger at all in v1.

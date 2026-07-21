@@ -10,6 +10,8 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import java.math.BigDecimal;
 import java.time.Instant;
+import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 /**
@@ -67,9 +69,19 @@ public class Payment {
         this.status = PaymentStatus.CREATED;
     }
 
-    // TODO (you write this): a transitionTo(PaymentStatus next) method that
-    // validates the transition against the legal-transitions map before
-    // mutating status. This is the heart of the state machine — don't let
-    // it just be `this.status = next` with no validation, or the "state
-    // machine" is only a state machine in name.
+    public void transitionTo(PaymentStatus target) {
+        Set<PaymentStatus> allowedTargets = LEGAL_TRANSITIONS.get(this.status);
+        if (!allowedTargets.contains(target)) {
+            throw new IllegalStateTransitionException(this.status, target);
+        }
+        this.status = target;
+    }
+    private static final Map<PaymentStatus, Set<PaymentStatus>> LEGAL_TRANSITIONS = Map.of(
+        PaymentStatus.CREATED,    Set.of(PaymentStatus.AUTHORIZED, PaymentStatus.FAILED),
+        PaymentStatus.AUTHORIZED, Set.of(PaymentStatus.CAPTURED, PaymentStatus.FAILED),
+        PaymentStatus.CAPTURED,   Set.of(PaymentStatus.SETTLED, PaymentStatus.REVERSED),
+        PaymentStatus.SETTLED,    Set.of(),
+        PaymentStatus.FAILED,     Set.of(),
+        PaymentStatus.REVERSED,   Set.of()
+);
 }
