@@ -5,6 +5,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.paymentplatform.payment.dto.CreatePaymentRequest;
 import com.paymentplatform.payment.dto.PaymentResponse;
 import com.paymentplatform.payment.entity.Payment;
+import com.paymentplatform.payment.entity.PaymentNotReversibleException;
+import com.paymentplatform.payment.entity.PaymentStatus;
 import com.paymentplatform.payment.repository.PaymentRepository;
 import com.paymentplatform.orchestration.messaging.PaymentEvent;
 import com.paymentplatform.orchestration.messaging.PaymentEventProducer;
@@ -18,6 +20,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.Duration;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 public class PaymentService {
@@ -72,6 +75,18 @@ public class PaymentService {
         PaymentResponse response = toResponse(payment);
         cache(redisKey, response);
         return response;
+    }
+
+    public void reversePayment(UUID paymentId) {
+        Payment payment = paymentRepository.findById(paymentId)
+                .orElseThrow(() -> new IllegalArgumentException("No payment found: " + paymentId));
+
+        if (payment.getStatus() != PaymentStatus.CAPTURED) {
+            throw new PaymentNotReversibleException(payment.getStatus());
+        }
+
+        paymentEventProducer.publish(
+                new PaymentEvent(payment.getId(), PaymentEventType.PAYMENT_REVERSED, payment.getAmount()));
     }
 
     private PaymentResponse toResponse(Payment payment) {

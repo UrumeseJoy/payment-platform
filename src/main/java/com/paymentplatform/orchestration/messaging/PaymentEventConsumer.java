@@ -67,8 +67,13 @@ public class PaymentEventConsumer {
 
         switch (result.outcome()) {
             case SUCCESS -> {
+                // Settlement is a separate, typically batched process (often T+1/T+2
+                // after capture) run independently of the capture flow — it is not an
+                // instantaneous side effect of a successful capture. v1 does not
+                // implement a settlement batch job, so CAPTURED is the practical
+                // terminal success state for now; SETTLED remains a valid transition
+                // in the state machine, just not one triggered from here.
                 ledgerService.applyTransition(event.paymentId(), PaymentStatus.CAPTURED);
-                ledgerService.applyTransition(event.paymentId(), PaymentStatus.SETTLED);
             }
             case DECLINED -> {
                 ledgerService.applyTransition(event.paymentId(), PaymentStatus.FAILED);
