@@ -16,7 +16,14 @@
       "Read(//Users/urumesejoy/.m2/repository/**)",
       "Bash(find ~/.m2/repository/org/springframework/kafka/spring-kafka -maxdepth 1 -type d | tail -5)",
       "Read(//Users/urumesejoy/.m2/repository/org/springframework/kafka/spring-kafka/**)",
-      "Bash(unzip -l ~/.m2/repository/org/springframework/kafka/spring-kafka/3.2.4/spring-kafka-3.2.4.jar)"
+      "Bash(unzip -l ~/.m2/repository/org/springframework/kafka/spring-kafka/3.2.4/spring-kafka-3.2.4.jar)",
+      "Read(//Users/urumesejoy/.m2/repository/org/awaitility/**)",
+      "Read(//Users/urumesejoy/.m2/repository/org/testcontainers/**)",
+      "Bash(curl -s \"https://search.maven.org/solrsearch/select?q=g:org.awaitility+AND+a:awaitility&core=gav&rows=5&wt=json\")",
+      "Bash(unzip -l ~/.m2/repository/org/testcontainers/kafka/1.20.1/kafka-1.20.1.jar)",
+      "Bash(mvn -q -Dtest=PaymentEventConsumerIntegrationTest test)",
+      "Bash(mvn -q -Dtest=LedgerServiceConcurrencyIntegrationTest test)",
+      "Bash(docker stop *)"
     ]
   }
 }
