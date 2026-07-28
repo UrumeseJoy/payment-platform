@@ -23,7 +23,13 @@
       "Bash(unzip -l ~/.m2/repository/org/testcontainers/kafka/1.20.1/kafka-1.20.1.jar)",
       "Bash(mvn -q -Dtest=PaymentEventConsumerIntegrationTest test)",
       "Bash(mvn -q -Dtest=LedgerServiceConcurrencyIntegrationTest test)",
-      "Bash(docker stop *)"
+      "Bash(docker stop *)",
+      "Bash(javap -classpath ~/.m2/repository/org/springframework/spring-tx/6.1.13/spring-tx-6.1.13.jar org.springframework.dao.OptimisticLockingFailureException)",
+      "Read(//Users/urumesejoy/.m2/repository/org/springframework/**)",
+      "Bash(xargs -I{} sh -c 'unzip -l {} 2>/dev/null | grep -q \"dao/OptimisticLockingFailureException.class\" && echo {}')",
+      "Bash(mvn -q -Dtest=LedgerServiceRetryLogicTest test)",
+      "Bash(mvn -q -Dtest=PaymentReversalIntegrationTest test)",
+      "Bash(mvn -q -Dtest=PaymentServiceIdempotencyTest test)"
     ]
   }
 }
