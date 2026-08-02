@@ -5,7 +5,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.paymentplatform.gateway.GatewayResult;
 import com.paymentplatform.gateway.PaymentGateway;
 import com.paymentplatform.ledger.service.LedgerService;
+import com.paymentplatform.payment.entity.Payment;
 import com.paymentplatform.payment.entity.PaymentStatus;
+import com.paymentplatform.payment.repository.PaymentRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.kafka.annotation.KafkaListener;
@@ -18,16 +20,16 @@ public class PaymentEventConsumer {
 
     private final PaymentGateway paymentGateway;
     private final LedgerService ledgerService;
-    private final PaymentEventProducer paymentEventProducer;
+    private final PaymentRepository paymentRepository;
     private final ObjectMapper objectMapper;
 
     public PaymentEventConsumer(PaymentGateway paymentGateway,
                                  LedgerService ledgerService,
-                                 PaymentEventProducer paymentEventProducer,
+                                 PaymentRepository paymentRepository,
                                  ObjectMapper objectMapper) {
         this.paymentGateway = paymentGateway;
         this.ledgerService = ledgerService;
-        this.paymentEventProducer = paymentEventProducer;
+        this.paymentRepository = paymentRepository;
         this.objectMapper = objectMapper;
     }
 
@@ -45,13 +47,23 @@ public class PaymentEventConsumer {
     }
 
     private void handlePaymentCreated(PaymentEvent event) {
+        Payment payment = paymentRepository.findById(event.paymentId())
+                .orElseThrow(() -> new IllegalArgumentException("Payment not found: " + event.paymentId()));
+
+        if (payment.getStatus() != PaymentStatus.CREATED) {
+            log.info("skipping duplicate delivery for payment {}, already at status {}",
+                    event.paymentId(), payment.getStatus());
+            return;
+        }
+
         GatewayResult result = paymentGateway.authorize(event.paymentId(), event.amount());
 
         switch (result.outcome()) {
             case SUCCESS -> {
-                ledgerService.applyTransition(event.paymentId(), PaymentStatus.AUTHORIZED);
-                paymentEventProducer.publish(
-                        new PaymentEvent(event.paymentId(), PaymentEventType.PAYMENT_AUTHORIZED, event.amount()));
+                PaymentEvent authorizedEvent =
+                        new PaymentEvent(event.paymentId(), PaymentEventType.PAYMENT_AUTHORIZED, event.amount());
+                ledgerService.applyTransition(event.paymentId(), PaymentStatus.AUTHORIZED,
+                        PaymentEventType.PAYMENT_AUTHORIZED.name(), serialize(authorizedEvent));
             }
             case DECLINED -> {
                 ledgerService.applyTransition(event.paymentId(), PaymentStatus.FAILED);
@@ -63,6 +75,15 @@ public class PaymentEventConsumer {
     }
 
     private void handlePaymentAuthorized(PaymentEvent event) {
+        Payment payment = paymentRepository.findById(event.paymentId())
+                .orElseThrow(() -> new IllegalArgumentException("Payment not found: " + event.paymentId()));
+
+        if (payment.getStatus() != PaymentStatus.AUTHORIZED) {
+            log.info("skipping duplicate delivery for payment {}, already at status {}",
+                    event.paymentId(), payment.getStatus());
+            return;
+        }
+
         GatewayResult result = paymentGateway.capture(event.paymentId(), event.amount());
 
         switch (result.outcome()) {
@@ -89,6 +110,14 @@ public class PaymentEventConsumer {
             return objectMapper.readValue(message, PaymentEvent.class);
         } catch (JsonProcessingException e) {
             throw new IllegalArgumentException("Failed to deserialize payment event: " + message, e);
+        }
+    }
+
+    private String serialize(PaymentEvent event) {
+        try {
+            return objectMapper.writeValueAsString(event);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException("Failed to serialize payment event for payment " + event.paymentId(), e);
         }
     }
 }

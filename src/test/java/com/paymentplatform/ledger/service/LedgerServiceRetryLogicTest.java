@@ -1,6 +1,7 @@
 package com.paymentplatform.ledger.service;
 
 import com.paymentplatform.ledger.repository.LedgerEntryRepository;
+import com.paymentplatform.orchestration.messaging.OutboxEventRepository;
 import com.paymentplatform.payment.entity.Payment;
 import com.paymentplatform.payment.entity.PaymentStatus;
 import com.paymentplatform.payment.repository.PaymentRepository;
@@ -41,6 +42,7 @@ class LedgerServiceRetryLogicTest {
 
     private PaymentRepository paymentRepository;
     private LedgerEntryRepository ledgerEntryRepository;
+    private OutboxEventRepository outboxEventRepository;
     private LedgerService ledgerService;
     private UUID paymentId;
 
@@ -48,7 +50,12 @@ class LedgerServiceRetryLogicTest {
     void setUp() {
         paymentRepository = mock(PaymentRepository.class);
         ledgerEntryRepository = mock(LedgerEntryRepository.class);
-        ledgerService = new LedgerService(paymentRepository, ledgerEntryRepository);
+        outboxEventRepository = mock(OutboxEventRepository.class);
+        ledgerService = new LedgerService(paymentRepository, ledgerEntryRepository, outboxEventRepository);
+        // No Spring proxy exists in this pure-Mockito test, so self-injection is a plain
+        // self-reference here — applyOnce's @Transactional is not actually being tested by
+        // this class (it mocks the repositories directly), only the retry-count behavior is.
+        ledgerService.setSelf(ledgerService);
         paymentId = UUID.randomUUID();
 
         // Fresh CREATED-status Payment on every findById call, so each retry attempt

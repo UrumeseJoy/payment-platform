@@ -3,6 +3,8 @@ package com.paymentplatform.ledger.service;
 import com.paymentplatform.ledger.entity.EntryType;
 import com.paymentplatform.ledger.entity.LedgerEntry;
 import com.paymentplatform.ledger.repository.LedgerEntryRepository;
+import com.paymentplatform.orchestration.messaging.OutboxEvent;
+import com.paymentplatform.orchestration.messaging.OutboxEventRepository;
 import com.paymentplatform.payment.entity.Payment;
 import com.paymentplatform.payment.entity.PaymentStatus;
 import com.paymentplatform.payment.repository.PaymentRepository;
@@ -62,8 +64,9 @@ class LedgerServiceConcurrencyIntegrationTest {
 
     @Configuration
     @EnableAutoConfiguration
-    @EntityScan(basePackageClasses = {Payment.class, LedgerEntry.class})
-    @EnableJpaRepositories(basePackageClasses = {PaymentRepository.class, LedgerEntryRepository.class})
+    @EntityScan(basePackageClasses = {Payment.class, LedgerEntry.class, OutboxEvent.class})
+    @EnableJpaRepositories(basePackageClasses = {PaymentRepository.class, LedgerEntryRepository.class,
+            OutboxEventRepository.class})
     @Import(LedgerService.class)
     static class TestConfig {
     }

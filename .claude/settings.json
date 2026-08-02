@@ -29,7 +29,15 @@
       "Bash(xargs -I{} sh -c 'unzip -l {} 2>/dev/null | grep -q \"dao/OptimisticLockingFailureException.class\" && echo {}')",
       "Bash(mvn -q -Dtest=LedgerServiceRetryLogicTest test)",
       "Bash(mvn -q -Dtest=PaymentReversalIntegrationTest test)",
-      "Bash(mvn -q -Dtest=PaymentServiceIdempotencyTest test)"
+      "Bash(mvn -q -Dtest=PaymentServiceIdempotencyTest test)",
+      "Bash(docker info *)",
+      "Bash(mvn -q test)",
+      "Bash(xargs -I{} sh -c 'echo ==={}===; cat {}')",
+      "Bash(mvn -q test -Dtest=LedgerServiceConcurrencyIntegrationTest)",
+      "Bash(mvn -q compile)",
+      "Bash(mvn -q test-compile)",
+      "Bash(mvn -q -Dtest=PaymentServiceIdempotencyTest,PaymentReversalIntegrationTest,LedgerServiceRetryLogicTest,PaymentTest test)",
+      "Bash(mvn -q -Dtest=LedgerServiceAtomicityTest test)"
     ]
   }
 }
