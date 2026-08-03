@@ -56,7 +56,9 @@
       "Bash(unzip -o ~/.m2/repository/org/springframework/kafka/spring-kafka/3.2.4/spring-kafka-3.2.4-sources.jar org/springframework/kafka/support/KafkaHeaders.java -d .)",
       "Bash(grep -n \"PREFIX =\" /tmp/dlpr/org/springframework/kafka/support/KafkaHeaders.java)",
       "Read(//private/tmp/dlpr/org/springframework/kafka/support/**)",
-      "Bash(mvn -q -Dtest=PaymentEventDlqIntegrationTest test)"
+      "Bash(mvn -q -Dtest=PaymentEventDlqIntegrationTest test)",
+      "Bash(mvn -q -Dtest=ReconciliationServiceIntegrationTest,ReconciliationServiceCleanStateTest test)",
+      "Bash(mvn -q -Dtest=ReconciliationServiceIntegrationTest,ReconciliationServiceCleanStateTest,ReconciliationOrphanDetectionUnitTest test)"
     ]
   }
 }
