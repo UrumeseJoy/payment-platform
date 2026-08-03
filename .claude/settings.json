@@ -37,7 +37,26 @@
       "Bash(mvn -q compile)",
       "Bash(mvn -q test-compile)",
       "Bash(mvn -q -Dtest=PaymentServiceIdempotencyTest,PaymentReversalIntegrationTest,LedgerServiceRetryLogicTest,PaymentTest test)",
-      "Bash(mvn -q -Dtest=LedgerServiceAtomicityTest test)"
+      "Bash(mvn -q -Dtest=LedgerServiceAtomicityTest test)",
+      "Bash(find ~/.m2/repository/org/springframework/kafka/spring-kafka/3.2.4 -iname \"*sources*\")",
+      "Read(//Users/urumesejoy/.m2/repository/org/springframework/kafka/spring-kafka/3.2.4/**)",
+      "Read(//private/tmp/dlpr/**)",
+      "Bash(unzip -o ~/.m2/repository/org/springframework/kafka/spring-kafka/3.2.4/spring-kafka-3.2.4-sources.jar org/springframework/kafka/listener/DeadLetterPublishingRecoverer.java -d .)",
+      "Bash(grep -n \"HeaderNames\\\\|X_EXCEPTION\\\\|DEFAULT_HEADER_NAMES\\\\|class HeaderNames\" /tmp/dlpr/org/springframework/kafka/listener/DeadLetterPublishingRecoverer.java | head -60)",
+      "Read(//private/tmp/dlpr/org/springframework/kafka/listener/**)",
+      "Bash(sed -n '760,845p' /tmp/dlpr/org/springframework/kafka/listener/DeadLetterPublishingRecoverer.java)",
+      "Bash(sed -n '1170,1310p' /tmp/dlpr/org/springframework/kafka/listener/DeadLetterPublishingRecoverer.java)",
+      "Bash(sed -n '105,135p' /tmp/dlpr/org/springframework/kafka/listener/DeadLetterPublishingRecoverer.java)",
+      "Bash(grep -n \"createProducerRecord\" /tmp/dlpr/org/springframework/kafka/listener/DeadLetterPublishingRecoverer.java)",
+      "Bash(sed -n '660,700p' /tmp/dlpr/org/springframework/kafka/listener/DeadLetterPublishingRecoverer.java)",
+      "Bash(grep -n \"DEFAULT_DESTINATION_RESOLVER\" /tmp/dlpr/org/springframework/kafka/listener/DeadLetterPublishingRecoverer.java)",
+      "Bash(grep -n \"verifyPartition\" /tmp/dlpr/org/springframework/kafka/listener/DeadLetterPublishingRecoverer.java | head -10)",
+      "Bash(unzip -o ~/.m2/repository/org/springframework/kafka/spring-kafka/3.2.4/spring-kafka-3.2.4.jar org/springframework/kafka/listener/DefaultErrorHandler.class -d .)",
+      "Bash(javap -p org/springframework/kafka/listener/DefaultErrorHandler.class)",
+      "Bash(unzip -o ~/.m2/repository/org/springframework/kafka/spring-kafka/3.2.4/spring-kafka-3.2.4-sources.jar org/springframework/kafka/support/KafkaHeaders.java -d .)",
+      "Bash(grep -n \"PREFIX =\" /tmp/dlpr/org/springframework/kafka/support/KafkaHeaders.java)",
+      "Read(//private/tmp/dlpr/org/springframework/kafka/support/**)",
+      "Bash(mvn -q -Dtest=PaymentEventDlqIntegrationTest test)"
     ]
   }
 }
