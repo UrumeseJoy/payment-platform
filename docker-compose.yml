@@ -30,6 +30,14 @@ services:
   # Single-node Kafka in KRaft mode — no Zookeeper needed, simplest possible
   # setup for local dev. Not how you'd run it in prod, which is fine to say
   # out loud in an interview if asked.
+  #
+  # Image drift (known, accepted): local dev here uses confluentinc/cp-kafka:7.7.0, but
+  # the Testcontainers-based test suite (see PaymentEventConsumerIntegrationTest and other
+  # Testcontainers-based tests) uses apache/kafka:3.8.0 instead — testcontainers-kafka's
+  # KafkaContainer class only supports the official Apache Kafka image's startup script,
+  # not Confluent's. Not a bug, but worth reconciling once deployment infra is decided:
+  # should prod match this Confluent-based local dev image, or should everything
+  # standardize on Apache Kafka?
   kafka:
     image: confluentinc/cp-kafka:7.7.0
     ports:

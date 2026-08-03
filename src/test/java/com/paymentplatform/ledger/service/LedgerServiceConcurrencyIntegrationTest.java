@@ -48,10 +48,10 @@ import static org.assertj.core.api.Assertions.assertThat;
  * NewTopic bean from KafkaTopicConfig at context startup regardless of listener state,
  * which added a ~30-40s delay (and a latent failure risk under fail-fast admin
  * configs) when no broker was reachable. Simply excluding KafkaAutoConfiguration also
- * isn't enough on its own: PaymentEventProducer/PaymentEventConsumer are real @Service
- * beans that directly require a KafkaTemplate bean in their constructors, so removing
- * Kafka's auto-configuration without also removing those beans just trades a slow
- * failure for an immediate "no qualifying bean" one. Instead this test replaces
+ * isn't enough on its own: OutboxRelayService is a real @Service bean that directly
+ * requires a KafkaTemplate bean in its constructor, so removing Kafka's auto-configuration
+ * without also removing that bean just trades a slow failure for an immediate "no
+ * qualifying bean" one. Instead this test replaces
  * @SpringBootTest's default full-app context with the narrow TestConfig below — only
  * JPA/Postgres infrastructure plus LedgerService — so the Kafka-dependent beans are
  * never created in the first place and no Kafka broker is involved at all.

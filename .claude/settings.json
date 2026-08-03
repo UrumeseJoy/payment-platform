@@ -58,7 +58,8 @@
       "Read(//private/tmp/dlpr/org/springframework/kafka/support/**)",
       "Bash(mvn -q -Dtest=PaymentEventDlqIntegrationTest test)",
       "Bash(mvn -q -Dtest=ReconciliationServiceIntegrationTest,ReconciliationServiceCleanStateTest test)",
-      "Bash(mvn -q -Dtest=ReconciliationServiceIntegrationTest,ReconciliationServiceCleanStateTest,ReconciliationOrphanDetectionUnitTest test)"
+      "Bash(mvn -q -Dtest=ReconciliationServiceIntegrationTest,ReconciliationServiceCleanStateTest,ReconciliationOrphanDetectionUnitTest test)",
+      "Bash(git push *)"
     ]
   }
 }
