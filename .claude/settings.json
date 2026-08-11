@@ -59,7 +59,13 @@
       "Bash(mvn -q -Dtest=PaymentEventDlqIntegrationTest test)",
       "Bash(mvn -q -Dtest=ReconciliationServiceIntegrationTest,ReconciliationServiceCleanStateTest test)",
       "Bash(mvn -q -Dtest=ReconciliationServiceIntegrationTest,ReconciliationServiceCleanStateTest,ReconciliationOrphanDetectionUnitTest test)",
-      "Bash(git push *)"
+      "Bash(git push *)",
+      "Bash(timeout 30 mvn -q spring-boot:run)",
+      "Bash(grep -n \"Flyway\\\\|Migrating schema\\\\|Successfully applied\\\\|Schema-validation\" /tmp/springboot-run.log | head -20)",
+      "Read(//private/tmp/**)",
+      "Bash(lsof -nP -iTCP:8080 -sTCP:LISTEN)",
+      "Bash(grep -n \"Tomcat started\\\\|Started PaymentPlatformApplication\" /tmp/springboot-run2.log)",
+      "Bash(pkill -f \"spring-boot:run\")"
     ]
   }
 }
