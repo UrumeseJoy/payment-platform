@@ -6,3 +6,7 @@ target/
 .vscode/
 .DS_Store
 HELP.md
+.env
+.env.*
+!.env.example
+*.pem
