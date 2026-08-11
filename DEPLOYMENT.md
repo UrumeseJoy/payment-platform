@@ -52,7 +52,7 @@ asynchronously through Kafka. The current API has no `GET /payments/{id}` endpoi
 state on EC2:
 
 ```bash
-docker compose exec postgres psql -U "$POSTGRES_USER" -d "$POSTGRES_DB" \
+docker compose --env-file .env.production exec postgres psql -U payment_app -d payment_platform \
   -c 'SELECT id, status, amount, created_at FROM payments;'
 ```
 
